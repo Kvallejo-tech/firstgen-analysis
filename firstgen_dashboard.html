@@ -463,12 +463,54 @@
     .chart-nav a { padding: 14px 12px; font-size: 9px; }
   }
 
+  /* Skip to content */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 16px;
+    background: var(--gold);
+    color: var(--navy);
+    padding: 10px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 2px;
+    z-index: 9999;
+    text-decoration: none;
+    transition: top 0.2s;
+  }
+  .skip-link:focus { top: 16px; }
+
+  /* Focus styles */
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .btn:focus-visible, .score-select:focus-visible,
+  .chart-nav a:focus-visible, .legend-item:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  /* Screen-reader only */
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* Axis styles injected via JS */
 </style>
 </head>
 <body>
 
-<div class="tooltip" id="tooltip"></div>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<div class="tooltip" id="tooltip" role="tooltip" aria-live="polite"></div>
 
 <div class="top-bar">
   <span class="top-bar-name">Kevin Vallejo</span>
@@ -489,43 +531,45 @@
   </p>
 </section>
 
-<div class="kpi-row">
+<main id="main-content">
+<div class="kpi-row" role="region" aria-label="Key statistics">
   <div class="kpi">
-    <div class="kpi-label">First-Gen Graduation Rate</div>
-    <div class="kpi-value coral" id="kpi1">24%</div>
-    <div class="kpi-sub">Over 4-year period (1977–2017)</div>
+    <div class="kpi-label" id="kpi1-label">First-Gen Graduation Rate</div>
+    <div class="kpi-value coral" id="kpi1" aria-labelledby="kpi1-label" aria-describedby="kpi1-sub">24%</div>
+    <div class="kpi-sub" id="kpi1-sub">Over 4-year period (1977–2017)</div>
   </div>
   <div class="kpi">
-    <div class="kpi-label">Continuing-Gen Graduation Rate</div>
-    <div class="kpi-value gold" id="kpi2">59%</div>
-    <div class="kpi-sub">Same cohort, same period</div>
+    <div class="kpi-label" id="kpi2-label">Continuing-Gen Graduation Rate</div>
+    <div class="kpi-value gold" id="kpi2" aria-labelledby="kpi2-label" aria-describedby="kpi2-sub">59%</div>
+    <div class="kpi-sub" id="kpi2-sub">Same cohort, same period</div>
   </div>
   <div class="kpi">
-    <div class="kpi-label">Achievement Gap</div>
-    <div class="kpi-value teal" id="kpi3">35<span style="font-size:24px">pp</span></div>
-    <div class="kpi-sub">Percentage point difference</div>
+    <div class="kpi-label" id="kpi3-label">Achievement Gap</div>
+    <div class="kpi-value teal" id="kpi3" aria-labelledby="kpi3-label" aria-describedby="kpi3-sub"><span aria-label="35 percentage points">35<span aria-hidden="true" style="font-size:24px">pp</span></span></div>
+    <div class="kpi-sub" id="kpi3-sub">Percentage point difference</div>
   </div>
   <div class="kpi">
-    <div class="kpi-label">Hispanic First-Gen Rate</div>
-    <div class="kpi-value gold">58%</div>
-    <div class="kpi-sub">Highest first-gen share by race/ethnicity</div>
+    <div class="kpi-label" id="kpi4-label">Hispanic First-Gen Rate</div>
+    <div class="kpi-value gold" aria-labelledby="kpi4-label" aria-describedby="kpi4-sub">58%</div>
+    <div class="kpi-sub" id="kpi4-sub">Highest first-gen share by race/ethnicity</div>
   </div>
 </div>
 
-<nav class="chart-nav" id="chart-nav">
+<nav class="chart-nav" id="chart-nav" aria-label="Chart navigation">
   <a href="#chart-income" data-color="#4ecdc4">01 · Income &amp; Access</a>
   <a href="#chart-race"   data-color="#ff6b6b">02 · Race &amp; First-Gen</a>
   <a href="#chart-scores" data-color="#e8c547">03 · Score Analysis</a>
   <a href="#chart-grad"   data-color="#4ecdc4">04 · Graduation</a>
   <a href="#chart-debt"   data-color="#b07fd4">05 · Debt &amp; Income</a>
   <a href="#chart-eof3"   data-color="#e8c547">06 · EOF 3.0 GPA</a>
-  <a href="#chart-impact" data-color="#e8c547">07 · The Solution</a>
+  <a href="#chart-asap"   data-color="#4ecdc4">07 · CUNY ASAP</a>
+  <a href="#chart-impact" data-color="#e8c547">08 · The Solution</a>
 </nav>
 
 <div class="main">
 
   <!-- Chart 1: College Continuation by Income Quartile -->
-  <div class="card full-width" id="chart-income">
+  <div class="card full-width" id="chart-income" role="region" aria-label="Income and college access chart">
     <div class="card-label">Income &amp; Access</div>
     <div class="card-title">College Continuation Rate by Family Income Quartile</div>
     <div class="card-desc">Percentage of students who continue to college, broken down by family income level — illustrating how financial background shapes access to higher education.</div>
@@ -549,7 +593,7 @@
   </div>
 
   <!-- Chart 2: First-Gen % by Race/Ethnicity (Lollipop) -->
-  <div class="card full-width" id="chart-race">
+  <div class="card full-width" id="chart-race" role="region" aria-label="First-generation students by race and ethnicity chart">
     <div class="card-label">Race &amp; First-Generation Status</div>
     <div class="card-title">First-Generation Students by Race/Ethnicity</div>
     <div class="card-desc">Percentage of first-generation college students within each racial/ethnic group.</div>
@@ -567,14 +611,14 @@
   </div>
 
   <!-- Chart 3: Parental Education vs Scores -->
-  <div class="card full-width" id="chart-scores">
+  <div class="card full-width" id="chart-scores" role="region" aria-label="Test score analysis by parental education chart">
     <div class="card-label">Score Analysis</div>
     <div class="card-title">Parental Education Level vs. Average Test Scores</div>
     <div class="card-desc">Select a subject to filter. Hover bars for exact values. Data queried live via DuckDB.</div>
 
     <div class="score-filter-wrap">
       <span class="score-filter-label">Filter by subject</span>
-      <select class="score-select" id="score-select">
+      <select class="score-select" id="score-select" aria-label="Filter chart by subject">
         <option value="all">All Subjects</option>
         <option value="math">Math</option>
         <option value="reading">Reading</option>
@@ -597,7 +641,7 @@
   </div>
 
   <!-- Chart 4: Graduation Rates -->
-  <div class="card" id="chart-grad">
+  <div class="card" id="chart-grad" role="region" aria-label="Graduation rates by student generation chart">
     <div class="card-label">Graduation Outcomes</div>
     <div class="card-title">Graduation Rate by Student Generation</div>
     <div class="card-desc">First-generation vs. continuing-generation students. 1977–2017 cohort data.</div>
@@ -615,7 +659,7 @@
   </div>
 
   <!-- Chart 5: Debt vs Income Dumbbell -->
-  <div class="card full-width" id="chart-debt">
+  <div class="card full-width" id="chart-debt" role="region" aria-label="Student debt and post-graduation income comparison chart">
     <div class="card-label">Debt &amp; Income</div>
     <div class="card-title">Student Debt vs. Post-Graduation Income</div>
     <div class="card-desc">Average loan debt carried and median income one year after graduation — First-Generation vs. Continuing-Generation students.</div>
@@ -634,7 +678,7 @@
   </div>
 
   <!-- Chart 6: EOF vs Non-EOF 3.0 GPA -->
-  <div class="card full-width" id="chart-eof3">
+  <div class="card full-width" id="chart-eof3" role="region" aria-label="EOF vs non-EOF students meeting 3.0 GPA threshold chart">
     <div class="card-label">EOF Program · 3.0 GPA Threshold</div>
     <div class="card-title">EOF vs. Non-EOF Students Meeting 3.0 GPA — Over Time</div>
     <div class="card-desc">Percentage of EOF and non-EOF students maintaining a 3.0+ GPA each academic year, tracking academic excellence over time.</div>
@@ -656,7 +700,29 @@
   </div>
 
   <!-- Chart 7: Program Impact — Graduation Rates -->
-  <div class="card full-width" id="chart-impact">
+  <!-- Chart 7: CUNY ASAP Donut -->
+  <div class="card full-width" id="chart-asap" role="region" aria-label="CUNY ASAP graduation rate comparison chart">
+    <div class="card-label">CUNY ASAP Program</div>
+    <div class="card-title">CUNY ASAP Nearly Doubled Three-Year Graduation Rates</div>
+    <div class="card-desc">Comparing three-year graduation rates between students enrolled in CUNY's Accelerated Study in Associate Programs (ASAP) and those who were not.</div>
+
+    <div id="asap-chart-container">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <div class="insight">
+      <strong>Key Finding:</strong> CUNY ASAP students graduated at <strong>40.1%</strong> —
+      nearly double the <strong>21.8%</strong> rate of non-ASAP students. Comprehensive wraparound
+      support including tuition waivers, MetroCards, and academic advising made the difference.
+    </div>
+
+    <p style="margin-top:14px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);line-height:1.6;letter-spacing:0.5px">
+      Source: CUNY ASAP Three-Year Graduation Rate Study
+    </p>
+  </div>
+
+  <!-- Chart 8: The Solution -->
+  <div class="card full-width" id="chart-impact" role="region" aria-label="Support programs graduation rate comparison chart">
     <div class="card-label">The Solution</div>
     <div class="card-title">Support Programs Close the Gap</div>
     <div class="card-desc">Graduation rates across student categories — showing how EOF and TRIO support programs dramatically lift first-generation student outcomes.</div>
@@ -697,6 +763,8 @@
   </div>
 
 </div>
+
+</main>
 
 <footer>
   <span>Sources: NCES · U.S. Dept of Education · The Pell Institute · NJ EOF Progress Report · FirstGen Forward</span>
@@ -817,6 +885,8 @@ async function renderScoreChart(subject) {
     .append("svg")
     .attr("viewBox", `0 0 ${totalW} ${H + margin.top + margin.bottom}`)
     .attr("class", "chart-svg")
+    .attr("role", "img")
+    .attr("aria-label", `Bar chart showing average ${subjects.join(', ')} scores by parental education level`)
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -1695,8 +1765,112 @@ await renderGradChart();
 await renderIncomeChart();
 await renderEOF3Chart();
 await renderImpactChart();
+await renderASAPChart();
 await renderDebtChart();
 await renderRaceChart();
+
+// ─────────────────────────────────────────────────────────────
+// CHART 8: DONUT — CUNY ASAP GRADUATION RATES (single donut)
+// ─────────────────────────────────────────────────────────────
+async function renderASAPChart() {
+  const slices = [
+    { label: 'CUNY ASAP Graduated',     value: 40.1, color: '#4ecdc4' },
+    { label: 'Non-ASAP Graduated',       value: 21.8, color: '#ff6b6b' },
+    { label: 'Did Not Graduate',          value: 38.1, color: 'rgba(255,255,255,0.08)' },
+  ];
+
+  const container = document.getElementById("asap-chart-container");
+  container.innerHTML = "";
+
+  const totalW = container.clientWidth || 700;
+  const H = 320;
+  const cx = totalW / 2;
+  const cy = H / 2;
+  const outerR = Math.min(totalW / 2, H / 2) - 50;
+  const innerR = outerR * 0.58;
+
+  const svg = d3.select(container)
+    .append("svg")
+    .attr("viewBox", `0 0 ${totalW} ${H}`)
+    .attr("class", "chart-svg");
+
+  const pie = d3.pie().sort(null).value(d => d.value);
+  const arc    = d3.arc().innerRadius(innerR).outerRadius(outerR);
+  const arcBig = d3.arc().innerRadius(innerR).outerRadius(outerR + 8);
+  const g = svg.append("g").attr("transform", `translate(${cx},${cy})`);
+  const arcs = pie(slices);
+
+  arcs.forEach(d => {
+    const path = g.append("path")
+      .attr("fill", d.data.color)
+      .attr("stroke", "var(--card)")
+      .attr("stroke-width", 2)
+      .style("cursor", d.data.color.startsWith('rgba') ? "default" : "pointer");
+
+    path.transition()
+      .duration(900).ease(d3.easeCubicOut)
+      .attrTween("d", () => {
+        const interp = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
+        return t => arc(interp(t));
+      });
+
+    path
+      .on("mousemove", e => {
+        path.attr("d", arcBig(d));
+        showTooltip(e, `<strong>${d.data.label}</strong><div style="color:${d.data.color.startsWith('rgba') ? '#8899aa' : d.data.color};margin-top:4px"><strong>${d.data.value}%</strong></div>`);
+      })
+      .on("mouseleave", () => {
+        path.attr("d", arc(d));
+        hideTooltip();
+      });
+  });
+
+  // Center label
+  g.append("text")
+    .attr("text-anchor", "middle").attr("dy", "-1em")
+    .attr("font-family", "Playfair Display, serif")
+    .attr("font-size", "13px").attr("font-weight", "700")
+    .attr("fill", "#e8c547")
+    .text("Nearly");
+
+  g.append("text")
+    .attr("text-anchor", "middle").attr("dy", "0.5em")
+    .attr("font-family", "Playfair Display, serif")
+    .attr("font-size", "32px").attr("font-weight", "900")
+    .attr("fill", "#e8c547")
+    .text("2×");
+
+  // External labels with lines
+  const labelArc = d3.arc().innerRadius(outerR + 20).outerRadius(outerR + 20);
+  [
+    { slice: arcs[0], text: 'CUNY ASAP',       sub: '40.1%', color: '#4ecdc4' },
+    { slice: arcs[1], text: 'Non-ASAP',         sub: '21.8%', color: '#ff6b6b' },
+    { slice: arcs[2], text: 'Other Students',   sub: '38.1%', color: '#8899aa' },
+  ].forEach(({ slice, text, sub, color }) => {
+    const [lx, ly] = labelArc.centroid(slice);
+    const sign = lx > 0 ? 1 : -1;
+
+    g.append("line")
+      .attr("x1", arc.centroid(slice)[0])
+      .attr("y1", arc.centroid(slice)[1])
+      .attr("x2", lx).attr("y2", ly)
+      .attr("stroke", color).attr("stroke-width", 1).attr("opacity", 0.6);
+
+    g.append("text")
+      .attr("x", lx + sign * 8).attr("y", ly - 6)
+      .attr("text-anchor", sign > 0 ? "start" : "end")
+      .attr("font-family", "DM Sans, sans-serif")
+      .attr("font-size", "12px").attr("fill", color).attr("font-weight", "500")
+      .text(text);
+
+    g.append("text")
+      .attr("x", lx + sign * 8).attr("y", ly + 10)
+      .attr("text-anchor", sign > 0 ? "start" : "end")
+      .attr("font-family", "DM Mono, monospace")
+      .attr("font-size", "11px").attr("fill", color)
+      .text(sub);
+  });
+}
 
 // ─────────────────────────────────────────────────────────────
 // STICKY NAV — scroll spy + color-coded active state
@@ -1734,6 +1908,7 @@ window.addEventListener("resize", () => {
     renderIncomeChart();
     renderEOF3Chart();
     renderImpactChart();
+    renderASAPChart();
     renderDebtChart();
     renderRaceChart();
   }, 250);
