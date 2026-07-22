@@ -556,10 +556,10 @@
 </div>
 
 <nav class="chart-nav" id="chart-nav" aria-label="Chart navigation">
-  <a href="#chart-income"  data-color="#4ecdc4">01 · Income &amp; Access</a>
-  <a href="#chart-race"    data-color="#ff6b6b">02 · Race &amp; First-Gen</a>
-  <a href="#chart-scores"  data-color="#e8c547">03 · Score Analysis</a>
-  <a href="#chart-grad"    data-color="#4ecdc4">04 · Graduation</a>
+  <a href="#chart-grad"    data-color="#4ecdc4">01 · Graduation</a>
+  <a href="#chart-income"  data-color="#4ecdc4">02 · Income &amp; Access</a>
+  <a href="#chart-race"    data-color="#ff6b6b">03 · Race &amp; First-Gen</a>
+  <a href="#chart-scores"  data-color="#e8c547">04 · Score Analysis</a>
   <a href="#chart-debt"    data-color="#b07fd4">05 · Debt &amp; Income</a>
   <a href="#chart-budget"  data-color="#ff6b6b">06 · NJ Budget Cut</a>
   <a href="#chart-eof3"    data-color="#e8c547">07 · EOF 3.0 GPA</a>
@@ -569,11 +569,29 @@
 
 <div class="main">
 
-  <!-- Chart 1: College Continuation by Income Quartile -->
+  <!-- Chart 1: Graduation Rates -->
+  <div class="card" id="chart-grad" role="region" aria-label="Graduation rates by student generation chart">
+    <div class="card-label">Graduation Outcomes</div>
+    <div class="card-title">Graduation Rate by Student Generation</div>
+    <div class="card-desc">First-generation vs. continuing-generation students. 1977–2017 cohort data.</div>
+
+    <div id="grad-chart-container">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <div class="insight">
+      <strong>Only 24%</strong> of first-generation students graduate, compared to
+      <strong>59%</strong> for continuing-generation students — underscoring the urgent
+      need for mentorship, academic, and financial support programs.
+    </div>
+
+  </div>
+
+  <!-- Chart 2: College Continuation by Income Quartile -->
   <div class="card full-width" id="chart-income" role="region" aria-label="Income and college access chart">
     <div class="card-label">Income &amp; Access</div>
     <div class="card-title">College Continuation Rate by Family Income Quartile</div>
-    <div class="card-desc">Percentage of students who continue to college, broken down by family income level — illustrating how financial background shapes access to higher education.</div>
+    <div class="card-desc">Percentage of students who continue to college by family income level. Quartile ranges (2022): <strong style="color:#ff6b6b">Bottom — under $36K</strong> · <strong style="color:#ff9f43">Second — $36K–$72K</strong> · <strong style="color:#4ecdc4">Third — $72K–$116K</strong> · <strong style="color:#e8c547">Top — $116K+</strong></div>
 
     <div id="income-chart-container">
       <div class="loading"><div class="spinner"></div></div>
@@ -593,7 +611,7 @@
 
   </div>
 
-  <!-- Chart 2: First-Gen % by Race/Ethnicity (Lollipop) -->
+  <!-- Chart 3: First-Gen % by Race/Ethnicity (Lollipop) -->
   <div class="card full-width" id="chart-race" role="region" aria-label="First-generation students by race and ethnicity chart">
     <div class="card-label">Race &amp; First-Generation Status</div>
     <div class="card-title">First-Generation Students by Race/Ethnicity</div>
@@ -611,7 +629,7 @@
 
   </div>
 
-  <!-- Chart 3: Parental Education vs Scores -->
+  <!-- Chart 4: Parental Education vs Scores -->
   <div class="card full-width" id="chart-scores" role="region" aria-label="Test score analysis by parental education chart">
     <div class="card-label">Score Analysis</div>
     <div class="card-title">Parental Education Level vs. Average Test Scores</div>
@@ -637,24 +655,6 @@
       <strong>Key Finding:</strong> Students whose parents hold a master's degree score on average
       <strong>~10–12 points higher</strong> across all subjects compared to students whose parents
       have only some high school education — a direct proxy for first-generation student disadvantage.
-    </div>
-
-  </div>
-
-  <!-- Chart 4: Graduation Rates -->
-  <div class="card" id="chart-grad" role="region" aria-label="Graduation rates by student generation chart">
-    <div class="card-label">Graduation Outcomes</div>
-    <div class="card-title">Graduation Rate by Student Generation</div>
-    <div class="card-desc">First-generation vs. continuing-generation students. 1977–2017 cohort data.</div>
-
-    <div id="grad-chart-container">
-      <div class="loading"><div class="spinner"></div></div>
-    </div>
-
-    <div class="insight">
-      <strong>Only 24%</strong> of first-generation students graduate, compared to
-      <strong>59%</strong> for continuing-generation students — underscoring the urgent
-      need for mentorship, academic, and financial support programs.
     </div>
 
   </div>
@@ -1065,21 +1065,22 @@ async function renderIncomeChart() {
   const container = document.getElementById("income-chart-container");
   container.innerHTML = "";
 
-  const margin = { top: 10, right: 70, bottom: 40, left: 250 };
+  const margin = { top: 16, right: 70, bottom: 40, left: 20 };
   const totalW = container.clientWidth || 700;
   const W = totalW - margin.left - margin.right;
-  const rowH = 56;
+  const rowH = 80;
   const H = rows.length * rowH;
 
-  const svg = d3.select(container)
+  const svgEl = d3.select(container)
     .append("svg")
     .attr("viewBox", `0 0 ${totalW} ${H + margin.top + margin.bottom}`)
-    .attr("class", "chart-svg")
-    .append("g")
+    .attr("class", "chart-svg");
+
+  const svg = svgEl.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
   const x = d3.scaleLinear().domain([0, 100]).range([0, W]);
-  const y = d3.scaleBand().domain(rows.map(d => d.label)).range([0, H]).padding(0.3);
+  const y = d3.scaleBand().domain(rows.map(d => d.label)).range([0, H]).padding(0.28);
 
   // Grid lines
   svg.selectAll(".grid-line")
@@ -1102,29 +1103,28 @@ async function renderIncomeChart() {
         .attr("font-size", "9px");
     });
 
-  // Y axis
-  svg.append("g")
-    .call(d3.axisLeft(y).tickSize(0))
-    .call(g => {
-      g.select(".domain").remove();
-      g.selectAll("text")
-        .attr("fill", "#c8d8e8")
-        .attr("font-family", "DM Sans")
-        .attr("font-size", "12px")
-        .attr("dx", "-10px");
-    });
-
-  // Bars
+  // Bars + inline labels
   rows.forEach((d, i) => {
+    const [namePart, rangePart] = d.label.split(" — ");
     const cy = y(d.label);
     const bh = y.bandwidth();
+    const mid = cy + bh / 2;
+
+    // Quartile name above bar
+    svg.append("text")
+      .attr("x", 0).attr("y", cy - 5)
+      .attr("fill", "#8899aa")
+      .attr("font-family", "DM Sans, sans-serif")
+      .attr("font-size", "10px")
+      .attr("letter-spacing", "0.3px")
+      .text(namePart);
 
     // Track
     svg.append("rect")
       .attr("x", 0).attr("y", cy)
       .attr("width", W).attr("height", bh)
       .attr("fill", "rgba(255,255,255,0.02)")
-      .attr("rx", 2);
+      .attr("rx", 3);
 
     // Bar
     svg.append("rect")
@@ -1132,21 +1132,31 @@ async function renderIncomeChart() {
       .attr("width", 0).attr("height", bh)
       .attr("fill", BAR_COLORS[i])
       .attr("opacity", 0.85)
-      .attr("rx", 2)
+      .attr("rx", 3)
       .on("mousemove", e => {
-        showTooltip(e, `<strong>${d.label}</strong><div style="color:${BAR_COLORS[i]};margin-top:4px">Continuation rate: <strong>${d.rate}%</strong></div>`);
+        showTooltip(e, `<strong>${namePart}</strong><div style="color:${BAR_COLORS[i]};margin-top:4px">${rangePart} — <strong>${d.rate}%</strong></div>`);
       })
       .on("mouseleave", hideTooltip)
       .transition().duration(700).ease(d3.easeCubicOut)
       .attr("width", x(d.rate));
 
-    // Value label
+    // Dollar range inside the bar (left edge)
     svg.append("text")
-      .attr("x", 0)
-      .attr("y", cy + bh / 2)
+      .attr("x", 10).attr("y", mid)
+      .attr("dy", "0.35em")
+      .attr("fill", "rgba(255,255,255,0.88)")
+      .attr("font-family", "DM Mono, monospace")
+      .attr("font-size", "11px")
+      .attr("font-weight", "500")
+      .attr("pointer-events", "none")
+      .text(rangePart || "");
+
+    // Percentage value at end of bar
+    svg.append("text")
+      .attr("x", 0).attr("y", mid)
       .attr("dy", "0.35em")
       .attr("font-family", "DM Mono")
-      .attr("font-size", "11px")
+      .attr("font-size", "12px")
       .attr("font-weight", "500")
       .attr("fill", BAR_COLORS[i])
       .attr("opacity", 0)
