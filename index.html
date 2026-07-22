@@ -556,14 +556,15 @@
 </div>
 
 <nav class="chart-nav" id="chart-nav" aria-label="Chart navigation">
-  <a href="#chart-income" data-color="#4ecdc4">01 · Income &amp; Access</a>
-  <a href="#chart-race"   data-color="#ff6b6b">02 · Race &amp; First-Gen</a>
-  <a href="#chart-scores" data-color="#e8c547">03 · Score Analysis</a>
-  <a href="#chart-grad"   data-color="#4ecdc4">04 · Graduation</a>
-  <a href="#chart-debt"   data-color="#b07fd4">05 · Debt &amp; Income</a>
-  <a href="#chart-eof3"   data-color="#e8c547">06 · EOF 3.0 GPA</a>
-  <a href="#chart-asap"   data-color="#4ecdc4">07 · CUNY ASAP</a>
-  <a href="#chart-impact" data-color="#e8c547">08 · The Solution</a>
+  <a href="#chart-income"  data-color="#4ecdc4">01 · Income &amp; Access</a>
+  <a href="#chart-race"    data-color="#ff6b6b">02 · Race &amp; First-Gen</a>
+  <a href="#chart-scores"  data-color="#e8c547">03 · Score Analysis</a>
+  <a href="#chart-grad"    data-color="#4ecdc4">04 · Graduation</a>
+  <a href="#chart-debt"    data-color="#b07fd4">05 · Debt &amp; Income</a>
+  <a href="#chart-budget"  data-color="#ff6b6b">06 · NJ Budget Cut</a>
+  <a href="#chart-eof3"    data-color="#e8c547">07 · EOF 3.0 GPA</a>
+  <a href="#chart-asap"    data-color="#4ecdc4">08 · CUNY ASAP</a>
+  <a href="#chart-impact"  data-color="#e8c547">09 · The Solution</a>
 </nav>
 
 <div class="main">
@@ -629,7 +630,7 @@
     <div class="legend" id="score-legend"></div>
 
     <div id="score-chart-container">
-      <div class="loading"><div class="spinner"></div> Loading DuckDB...</div>
+      <div class="loading"><div class="spinner"></div></div>
     </div>
 
     <div class="insight">
@@ -677,7 +678,49 @@
 
   </div>
 
-  <!-- Chart 6: EOF vs Non-EOF 3.0 GPA -->
+  <!-- Chart 6: NJ FY2026 Higher Education Budget Cut -->
+  <div class="card full-width" id="chart-budget" role="region" aria-label="NJ FY2026 higher education budget cut and impact on first-generation support programs">
+    <div class="card-label">Budget Crisis · New Jersey FY2026</div>
+    <div class="card-title">A $401M Cut — Who Pays the Price?</div>
+    <div class="card-desc">New Jersey's FY2026 budget reduced higher education funding from $2.5B to $2.1B — a 16.1% cut that falls hardest on the wraparound programs first-generation students depend on most.</div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-bottom:28px;border:1px solid var(--border);border-radius:4px;overflow:hidden">
+      <div style="background:var(--deep);padding:20px 24px">
+        <div class="kpi-label">FY2025 Budget</div>
+        <div style="font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:#4ecdc4;line-height:1">$2.5B</div>
+        <div class="kpi-sub">Prior year allocation</div>
+      </div>
+      <div style="background:var(--deep);padding:20px 24px">
+        <div class="kpi-label">FY2026 Budget</div>
+        <div style="font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:#ff6b6b;line-height:1">$2.1B</div>
+        <div class="kpi-sub">Proposed reduction</div>
+      </div>
+      <div style="background:var(--deep);padding:20px 24px">
+        <div class="kpi-label">Total Cut</div>
+        <div style="font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:#ff6b6b;line-height:1">−$401M</div>
+        <div class="kpi-sub">−16.1% year-over-year</div>
+      </div>
+    </div>
+
+    <div id="budget-chart-container">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <div style="margin-top:28px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:16px">Programs at Risk — First-Gen Student Support</div>
+      <div id="budget-programs-container"></div>
+    </div>
+
+    <div class="insight" style="margin-top:24px">
+      <strong>The case for investment, not cuts:</strong> EOF alone serves over <strong>22,000 students</strong> at 29 NJ institutions. Every $1 invested returns <strong>$4–$7</strong> in tax revenue and workforce productivity. Without support, first-gen students graduate at <strong>24%</strong> — with EOF, that nearly triples. These cuts close doors, not deficits.
+    </div>
+
+    <p style="margin-top:14px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);line-height:1.6;letter-spacing:0.5px">
+      Sources: FY 2026 Higher Educational Services Budget Analysis · NJ Governor's FY2026 Budget Proposal · NJ Higher Education Student Assistance Authority · NJ EOF Annual Progress Report 2023 · NCES Program Return-on-Investment Studies
+    </p>
+  </div>
+
+  <!-- Chart 7: EOF vs Non-EOF 3.0 GPA -->
   <div class="card full-width" id="chart-eof3" role="region" aria-label="EOF vs non-EOF students meeting 3.0 GPA threshold chart">
     <div class="card-label">EOF Program · 3.0 GPA Threshold</div>
     <div class="card-title">EOF vs. Non-EOF Students Meeting 3.0 GPA — Over Time</div>
@@ -802,74 +845,21 @@ function moveTooltip(e) {
 function hideTooltip() { tooltip.style.opacity = 0; }
 
 
-// ─────────────────────────────────────────────────────────────
-// DUCKDB-WASM INIT + CSV LOAD
-// ─────────────────────────────────────────────────────────────
-const scoreContainer = document.getElementById("score-chart-container");
-scoreContainer.innerHTML = `<div class="loading"><div class="spinner"></div> Loading DuckDB-WASM…</div>`;
-
-let conn;
-try {
-  const duckdb = await import('https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm/+esm');
-  const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
-  const workerURL = URL.createObjectURL(
-    new Blob([`importScripts("${bundle.mainWorker}")`], { type: 'text/javascript' })
-  );
-  const worker = new Worker(workerURL);
-  const db = new duckdb.AsyncDuckDB(new duckdb.VoidLogger(), worker);
-  await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-  URL.revokeObjectURL(workerURL);
-
-  conn = await db.connect();
-
-  scoreContainer.innerHTML = `<div class="loading"><div class="spinner"></div> Loading StudentsPerformance.csv…</div>`;
-  const csvText = await fetch('./StudentsPerformance.csv').then(r => {
-    if (!r.ok) throw new Error(`StudentsPerformance.csv not found (HTTP ${r.status})`);
-    return r.text();
-  });
-  await db.registerFileText('students.csv', csvText);
-  await conn.query(`CREATE TABLE students AS SELECT * FROM read_csv_auto('students.csv')`);
-} catch (err) {
-  scoreContainer.innerHTML = `<div class="loading" style="color:#ff6b6b">Error: ${err.message}</div>`;
-  throw err;
-}
-
-async function query(sql) {
-  const result = await conn.query(sql);
-  return result.toArray().map(row => {
-    const out = {};
-    for (const [k, v] of Object.entries(row.toJSON())) {
-      out[k] = typeof v === 'bigint' ? Number(v) : v;
-    }
-    return out;
-  });
-}
 
 // ─────────────────────────────────────────────────────────────
 // CHART 1: GROUPED BAR — SCORES BY EDUCATION LEVEL
 // ─────────────────────────────────────────────────────────────
 let currentSubject = "all";
+let scoreData = null;
 
-const SCORE_SQL = `
-  SELECT
-    "parental level of education"                       AS education_level,
-    ROUND(AVG(CAST("math score"    AS INTEGER)), 1)     AS avg_math,
-    ROUND(AVG(CAST("reading score" AS INTEGER)), 1)     AS avg_reading,
-    ROUND(AVG(CAST("writing score" AS INTEGER)), 1)     AS avg_writing
-  FROM students
-  GROUP BY "parental level of education"
-  ORDER BY CASE "parental level of education"
-    WHEN 'some high school'    THEN 1
-    WHEN 'high school'         THEN 2
-    WHEN 'some college'        THEN 3
-    WHEN 'associate''s degree' THEN 4
-    WHEN 'bachelor''s degree'  THEN 5
-    WHEN 'master''s degree'    THEN 6
-    ELSE 7
-  END`;
+async function loadScoreData() {
+  if (scoreData) return scoreData;
+  scoreData = await fetch('./score_data.json').then(r => r.json());
+  return scoreData;
+}
 
 async function renderScoreChart(subject) {
-  const data = await query(SCORE_SQL);
+  const data = await loadScoreData();
   const container = document.getElementById("score-chart-container");
   container.innerHTML = "";
 
@@ -1760,14 +1750,17 @@ async function renderRaceChart() {
 // ─────────────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────────────
-await renderScoreChart("all");
-await renderGradChart();
-await renderIncomeChart();
-await renderEOF3Chart();
-await renderImpactChart();
-await renderASAPChart();
-await renderDebtChart();
-await renderRaceChart();
+await Promise.all([
+  renderScoreChart("all"),
+  renderGradChart(),
+  renderIncomeChart(),
+  renderDebtChart(),
+  renderBudgetChart(),
+  renderEOF3Chart(),
+  renderASAPChart(),
+  renderImpactChart(),
+  renderRaceChart(),
+]);
 
 // ─────────────────────────────────────────────────────────────
 // CHART 8: DONUT — CUNY ASAP GRADUATION RATES (single donut)
@@ -1873,6 +1866,193 @@ async function renderASAPChart() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// CHART 6: NJ FY2026 HIGHER EDUCATION BUDGET CUT
+// ─────────────────────────────────────────────────────────────
+async function renderBudgetChart() {
+  const budgetData = [
+    { year: "FY2026", amount: 2099, color: "#ff6b6b", label: "$2.1B" },
+    { year: "FY2025", amount: 2500, color: "#4ecdc4", label: "$2.5B" },
+  ];
+
+  const container = document.getElementById("budget-chart-container");
+  container.innerHTML = "";
+
+  const margin = { top: 20, right: 120, bottom: 30, left: 72 };
+  const totalW = container.clientWidth || 700;
+  const W = totalW - margin.left - margin.right;
+  const rowH = 70;
+  const H = budgetData.length * rowH;
+
+  const svg = d3.select(container)
+    .append("svg")
+    .attr("viewBox", `0 0 ${totalW} ${H + margin.top + margin.bottom}`)
+    .attr("class", "chart-svg")
+    .attr("role", "img")
+    .attr("aria-label", "Horizontal bar chart: NJ higher education budget FY2025 $2.5B vs FY2026 $2.1B, a $401M reduction")
+    .append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0, 2900]).range([0, W]);
+  const y = d3.scaleBand().domain(budgetData.map(d => d.year)).range([0, H]).padding(0.35);
+
+  // Grid lines (vertical)
+  svg.selectAll(".grid-line")
+    .data(x.ticks(5))
+    .join("line")
+    .attr("x1", d => x(d)).attr("x2", d => x(d))
+    .attr("y1", 0).attr("y2", H)
+    .attr("stroke", "rgba(255,255,255,0.05)")
+    .attr("stroke-dasharray", "3,4");
+
+  // X axis (bottom)
+  svg.append("g")
+    .attr("transform", `translate(0,${H})`)
+    .call(d3.axisBottom(x).ticks(5).tickFormat(d => "$" + (d / 1000).toFixed(1) + "B").tickSize(0))
+    .call(g => {
+      g.select(".domain").remove();
+      g.selectAll("text").attr("fill", "#8899aa").attr("font-family", "DM Mono").attr("font-size", "9px");
+    });
+
+  // Y axis (left — year labels)
+  svg.append("g")
+    .call(d3.axisLeft(y).tickSize(0))
+    .call(g => {
+      g.select(".domain").remove();
+      g.selectAll("text")
+        .attr("fill", "#c8d8e8")
+        .attr("font-family", "DM Mono")
+        .attr("font-size", "11px")
+        .attr("dx", "-10px");
+    });
+
+  // Track (background)
+  budgetData.forEach(d => {
+    svg.append("rect")
+      .attr("x", 0).attr("y", y(d.year))
+      .attr("width", W).attr("height", y.bandwidth())
+      .attr("fill", "rgba(255,255,255,0.02)")
+      .attr("rx", 2);
+  });
+
+  // Bars
+  svg.selectAll(".budget-bar")
+    .data(budgetData)
+    .join("rect")
+    .attr("class", "budget-bar")
+    .attr("y", d => y(d.year))
+    .attr("height", y.bandwidth())
+    .attr("fill", d => d.color)
+    .attr("rx", 2)
+    .attr("opacity", 0.85)
+    .attr("x", 0).attr("width", 0)
+    .on("mousemove", (e, d) => {
+      showTooltip(e, `<strong>${d.year}</strong><div style="color:${d.color};margin-top:4px">NJ Higher Ed Budget: <strong>${d.label}</strong></div>`);
+    })
+    .on("mouseleave", hideTooltip)
+    .transition().duration(700).ease(d3.easeCubicOut)
+    .attr("width", d => x(d.amount));
+
+  // Value labels
+  svg.selectAll(".budget-bar-label")
+    .data(budgetData)
+    .join("text")
+    .attr("class", "budget-bar-label")
+    .attr("y", d => y(d.year) + y.bandwidth() / 2)
+    .attr("dy", "0.35em")
+    .attr("x", 0)
+    .attr("fill", d => d.color)
+    .attr("font-family", "Playfair Display, serif")
+    .attr("font-size", "22px")
+    .attr("font-weight", "900")
+    .attr("opacity", 0)
+    .text(d => d.label)
+    .transition().delay(500).duration(300)
+    .attr("x", d => x(d.amount) + 10)
+    .attr("opacity", 1);
+
+  // Cut annotation
+  const fy25y = y("FY2025") + y.bandwidth() / 2;
+  const fy26y = y("FY2026") + y.bandwidth() / 2;
+  const midY = (fy25y + fy26y) / 2;
+  const ax = x(2099) + 6;
+
+  svg.append("line")
+    .attr("x1", x(2500)).attr("x2", x(2099))
+    .attr("y1", fy25y).attr("y2", fy25y)
+    .attr("stroke", "rgba(255,107,107,0.35)")
+    .attr("stroke-width", 1)
+    .attr("stroke-dasharray", "4,3");
+
+  svg.append("text")
+    .attr("x", ax + 2).attr("y", fy25y - 6)
+    .attr("fill", "#ff6b6b")
+    .attr("font-family", "Playfair Display, serif")
+    .attr("font-size", "13px").attr("font-weight", "700")
+    .text("−$401M");
+
+  svg.append("text")
+    .attr("x", ax + 2).attr("y", fy25y + 10)
+    .attr("fill", "#ff6b6b")
+    .attr("font-family", "DM Mono, monospace")
+    .attr("font-size", "9px").attr("letter-spacing", "0.5px")
+    .text("−16.1%");
+
+  // Programs at risk list
+  const programs = [
+    {
+      name: "Educational Opportunity Fund (EOF)",
+      impact: "est. −$12M+",
+      color: "#ff6b6b",
+      note: "Serves 22,000+ students at 29 NJ colleges — the backbone of first-gen support in New Jersey",
+    },
+    {
+      name: "Tuition Aid Grant (TAG)",
+      impact: "est. −$60M+",
+      color: "#ff9f43",
+      note: "NJ's largest need-based grant program; first-generation, low-income students are primary recipients",
+    },
+    {
+      name: "Garden State Guarantee (GSG)",
+      impact: "est. −$16M+",
+      color: "#ff9f43",
+      note: "Last-dollar tuition coverage for families earning under $65K — directly lifts first-gen enrollment",
+    },
+    {
+      name: "TRIO Student Support Services",
+      impact: "federal match at risk",
+      color: "#b07fd4",
+      note: "Tutoring, advising, and retention services; state funding loss can trigger loss of federal matching funds",
+    },
+    {
+      name: "EOF Summer Bridge Programs",
+      impact: "est. −$2M+",
+      color: "#ff6b6b",
+      note: "Pre-college preparation for incoming first-generation students — cuts here mean students arrive unprepared",
+    },
+  ];
+
+  const progContainer = document.getElementById("budget-programs-container");
+  progContainer.innerHTML = "";
+
+  programs.forEach((p, i) => {
+    const row = document.createElement("div");
+    row.style.cssText = `display:flex;align-items:flex-start;gap:16px;padding:14px 0;${i < programs.length - 1 ? "border-bottom:1px solid rgba(232,197,71,0.1)" : ""}`;
+
+    row.innerHTML = `
+      <div style="flex:1;min-width:0">
+        <div style="color:var(--cream);font-size:13px;font-family:'DM Sans',sans-serif;font-weight:400;margin-bottom:3px">${p.name}</div>
+        <div style="color:var(--muted);font-size:11px;font-family:'DM Mono',monospace;line-height:1.5;letter-spacing:0.2px">${p.note}</div>
+      </div>
+      <div style="flex-shrink:0;background:rgba(255,107,107,0.1);border:1px solid ${p.color};border-radius:2px;padding:5px 12px;margin-top:2px">
+        <span style="color:${p.color};font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.5px;white-space:nowrap">${p.impact}</span>
+      </div>
+    `;
+    progContainer.appendChild(row);
+  });
+}
+
+
+// ─────────────────────────────────────────────────────────────
 // STICKY NAV — scroll spy + color-coded active state
 // ─────────────────────────────────────────────────────────────
 const navLinks = document.querySelectorAll('.chart-nav a');
@@ -1906,10 +2086,11 @@ window.addEventListener("resize", () => {
     renderScoreChart(currentSubject);
     renderGradChart();
     renderIncomeChart();
-    renderEOF3Chart();
-    renderImpactChart();
-    renderASAPChart();
     renderDebtChart();
+    renderBudgetChart();
+    renderEOF3Chart();
+    renderASAPChart();
+    renderImpactChart();
     renderRaceChart();
   }, 250);
 });

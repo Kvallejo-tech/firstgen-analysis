@@ -1,0 +1,38 @@
+[
+  {
+    "education_level": "some high school",
+    "avg_math": 63.5,
+    "avg_reading": 66.9,
+    "avg_writing": 64.9
+  },
+  {
+    "education_level": "high school",
+    "avg_math": 62.1,
+    "avg_reading": 64.7,
+    "avg_writing": 62.4
+  },
+  {
+    "education_level": "some college",
+    "avg_math": 67.1,
+    "avg_reading": 69.5,
+    "avg_writing": 68.8
+  },
+  {
+    "education_level": "associate's degree",
+    "avg_math": 67.9,
+    "avg_reading": 70.9,
+    "avg_writing": 69.9
+  },
+  {
+    "education_level": "bachelor's degree",
+    "avg_math": 69.4,
+    "avg_reading": 73.0,
+    "avg_writing": 73.4
+  },
+  {
+    "education_level": "master's degree",
+    "avg_math": 69.7,
+    "avg_reading": 75.4,
+    "avg_writing": 75.7
+  }
+]
