@@ -2105,5 +2105,297 @@ window.addEventListener("resize", () => {
   }, 250);
 });
 </script>
+
+<!-- ── AI Chat Assistant ─────────────────────────────────── -->
+<style>
+#chat-widget {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  font-family: 'DM Sans', sans-serif;
+}
+#chat-toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e8c547;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(232,197,71,0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  color: #0d1b2a;
+}
+#chat-toggle:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(232,197,71,0.6); }
+#chat-panel {
+  position: absolute;
+  bottom: 68px;
+  right: 0;
+  width: 360px;
+  height: 500px;
+  background: #1a2940;
+  border: 1px solid rgba(232,197,71,0.18);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+  transform: scale(0.92) translateY(16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  overflow: hidden;
+}
+#chat-panel.chat-open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+#chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(232,197,71,0.18);
+  background: #0d1b2a;
+  flex-shrink: 0;
+}
+#chat-header-title { display: flex; align-items: center; gap: 9px; }
+#chat-header-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #4ecdc4;
+  animation: chat-pulse 2s infinite;
+}
+@keyframes chat-pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+#chat-header-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  color: #e8c547;
+  text-transform: uppercase;
+}
+#chat-header-sub { font-size: 11px; color: #8899aa; margin-left: 2px; }
+#chat-close {
+  background: none; border: none; color: #8899aa; cursor: pointer;
+  display: flex; align-items: center; padding: 4px; border-radius: 4px;
+  transition: color 0.15s;
+}
+#chat-close:hover { color: #f5f0e8; }
+#chat-messages {
+  flex: 1; overflow-y: auto; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth;
+}
+#chat-messages::-webkit-scrollbar { width: 3px; }
+#chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.cmsg {
+  max-width: 88%; padding: 9px 13px; border-radius: 12px;
+  font-size: 13px; line-height: 1.55;
+}
+.cmsg.user {
+  align-self: flex-end;
+  background: rgba(232,197,71,0.14);
+  border: 1px solid rgba(232,197,71,0.28);
+  color: #f5f0e8;
+  border-bottom-right-radius: 4px;
+}
+.cmsg.bot {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.09);
+  color: #f5f0e8;
+  border-bottom-left-radius: 4px;
+  white-space: pre-line;
+}
+.cmsg.thinking {
+  align-self: flex-start;
+  color: #8899aa;
+  font-size: 12px;
+  font-style: italic;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-bottom-left-radius: 4px;
+}
+#chat-footer {
+  padding: 10px 14px;
+  border-top: 1px solid rgba(232,197,71,0.18);
+  background: #0d1b2a;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+#chat-input {
+  flex: 1; background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(232,197,71,0.18); border-radius: 8px;
+  padding: 9px 12px; color: #f5f0e8;
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  outline: none; transition: border-color 0.15s;
+}
+#chat-input::placeholder { color: #8899aa; }
+#chat-input:focus { border-color: rgba(232,197,71,0.5); }
+#chat-send {
+  width: 36px; height: 36px; border-radius: 8px; background: #e8c547;
+  border: none; color: #0d1b2a; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.1s; flex-shrink: 0;
+}
+#chat-send:hover { background: #f0d060; transform: scale(1.06); }
+#chat-send:disabled { background: #8899aa; cursor: not-allowed; transform: none; }
+</style>
+
+<div id="chat-widget">
+  <button id="chat-toggle" onclick="chatWidgetToggle()" aria-label="Open data assistant">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+    </svg>
+  </button>
+  <div id="chat-panel" role="dialog" aria-label="Data Assistant">
+    <div id="chat-header">
+      <div id="chat-header-title">
+        <div id="chat-header-dot"></div>
+        <div>
+          <div id="chat-header-label">KevinGBT</div>
+        </div>
+      </div>
+      <button id="chat-close" onclick="chatWidgetToggle()" aria-label="Close chat">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+
+
+    <div id="chat-messages"></div>
+
+    <div id="chat-footer">
+      <input id="chat-input" type="text" placeholder="Ask about the data…"
+             onkeydown="if(event.key==='Enter'&&!event.shiftKey)chatWidgetSend()" maxlength="500" />
+      <button id="chat-send" onclick="chatWidgetSend()" aria-label="Send">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const WORKER_URL = 'https://kevingbt-proxy.kvallejo.workers.dev';
+
+  const SYSTEM = `You are KevinGBT, a friendly assistant on a dashboard about first-generation college students, created by Kevin Vallejo at Ramapo College of NJ (2026).
+
+A "first-generation college student" means neither of their parents went to college. A "continuing-generation student" means at least one parent went to college.
+
+Your job is to explain the data in plain, everyday language that anyone can understand — no academic jargon, no assumptions about background knowledge. If you use a term that might be unfamiliar, briefly explain it in simple words. Write like you're talking to a curious friend, not writing a report.
+
+Answer questions based strictly on this data. Be warm, clear, and specific with numbers.
+
+KEY DATA POINTS:
+- Graduation rates: First-gen students graduate college at 24%, while students whose parents went to college graduate at 59% (data from 1977–2017, tracked by the National Center for Education Statistics)
+- College continuation by family income (2022) — how many students actually go to college based on how much their family earns:
+    Lowest income families (under $36K/year): 56% go to college
+    Lower-middle income ($36K–$72K/year): 63% go to college
+    Upper-middle income ($72K–$116K/year): 76% go to college
+    Highest income families ($116K+/year): 85% go to college
+    → That's a 29-point gap between the richest and poorest families
+- First-gen rates by race/ethnicity — what percent of students in each group are first-gen:
+    Hispanic/Latino students: 58% are first-gen
+    Black students: 51% are first-gen
+    White students: 30% are first-gen
+- Test scores: Students whose parents have a master's degree score about 10–12 points higher on average in math, reading, and writing compared to students whose parents never attended college
+- Student debt & income: First-gen students graduate with $12,000 more debt on average, but earn $36,000 less per year than students whose parents went to college — making it much harder to pay that debt back
+- NJ budget cut: New Jersey cut its higher education budget by $401 million (about 16%) in 2026 — from $2.5 billion down to $2.1 billion
+- EOF program: The Educational Opportunity Fund (EOF) is a NJ program that gives academic and financial support to students from low-income backgrounds. It serves over 22,000 students at 29 NJ colleges. For every $1 spent, it returns $4–$7 back to the economy through better jobs and tax revenue
+- GPA impact of EOF: EOF students saw a 13-point increase in the share of students earning a 3.0 GPA or higher, compared to similar students without the program
+- How support programs change graduation rates:
+    No support program: 24% graduate
+    TRIO Student Support Services (a federal tutoring/advising program): 42% graduate
+    EOF (NJ's support program): 58% graduate — almost the same as students whose parents went to college (59%)
+- CUNY ASAP: A program at City University of New York that gives students free tutoring, MetroCards, and extra advising. Students in it graduated at 40.1% vs 21.8% for those not in it — nearly double the rate
+
+SOURCES: NCES, U.S. Dept of Education, The Pell Institute, NJ EOF Progress Report, FirstGen Forward.
+
+Keep responses to 2–4 sentences unless more detail is asked for. Always use simple words. If someone asks something not in this data, say so honestly.`;
+
+  const history = [];
+  let isOpen = false;
+
+  function $(id) { return document.getElementById(id); }
+
+  window.chatWidgetToggle = function() {
+    isOpen = !isOpen;
+    $('chat-panel').classList.toggle('chat-open', isOpen);
+    if (isOpen) {
+      if (history.length === 0) greet();
+      setTimeout(() => $('chat-input').focus(), 220);
+    }
+  };
+
+  function greet() {
+    addMsg('bot', "Hi! I'm KevinGBT. Ask me anything about this dashboard — graduation rates, income gaps, race data, budget cuts, EOF outcomes, and more.");
+  }
+
+  function addMsg(role, text) {
+    const el = document.createElement('div');
+    el.className = 'cmsg ' + role;
+    if (role === 'bot') {
+      const spaced = text.replace(/([.!?])\s+/g, '$1\n\n').trim();
+      el.textContent = spaced;
+    } else {
+      el.textContent = text;
+    }
+    $('chat-messages').appendChild(el);
+    $('chat-messages').scrollTop = $('chat-messages').scrollHeight;
+    return el;
+  }
+
+  window.chatWidgetSend = async function() {
+    const input = $('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    $('chat-send').disabled = true;
+    input.disabled = true;
+
+    addMsg('user', text);
+    history.push({ role: 'user', content: text });
+
+    const thinking = addMsg('thinking', 'Thinking…');
+
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 450,
+          system: SYSTEM,
+          messages: history
+        })
+      });
+
+      const data = await res.json();
+      thinking.remove();
+
+      if (!res.ok) {
+        addMsg('bot', `⚠ ${data?.error?.message || 'Something went wrong — try again.'}`);
+        history.pop();
+      } else {
+        const reply = data.content[0].text;
+        addMsg('bot', reply);
+        history.push({ role: 'assistant', content: reply });
+        if (history.length > 20) history.splice(0, 2);
+      }
+    } catch {
+      thinking.remove();
+      addMsg('bot', 'Connection error — check your network and try again.');
+      history.pop();
+    }
+
+    $('chat-send').disabled = false;
+    input.disabled = false;
+    input.focus();
+  };
+})();
+</script>
 </body>
 </html>
